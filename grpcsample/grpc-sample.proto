@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+service File {
+  rpc GetMyFile (RequestType) returns (stream MyFileResponse) {};
+}
+
+message RequestType {
+}
+
+message MyFileResponse {
+  string name = 1;
+}
