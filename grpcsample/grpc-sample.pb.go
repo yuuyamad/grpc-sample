@@ -33,7 +33,7 @@ func (m *RequestType) Reset()         { *m = RequestType{} }
 func (m *RequestType) String() string { return proto.CompactTextString(m) }
 func (*RequestType) ProtoMessage()    {}
 func (*RequestType) Descriptor() ([]byte, []int) {
-	return fileDescriptor_grpc_sample_8ee11f9f828ceb3f, []int{0}
+	return fileDescriptor_grpc_sample_69eb31947fd22553, []int{0}
 }
 func (m *RequestType) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RequestType.Unmarshal(m, b)
@@ -64,7 +64,7 @@ func (m *MyFileResponse) Reset()         { *m = MyFileResponse{} }
 func (m *MyFileResponse) String() string { return proto.CompactTextString(m) }
 func (*MyFileResponse) ProtoMessage()    {}
 func (*MyFileResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_grpc_sample_8ee11f9f828ceb3f, []int{1}
+	return fileDescriptor_grpc_sample_69eb31947fd22553, []int{1}
 }
 func (m *MyFileResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_MyFileResponse.Unmarshal(m, b)
@@ -91,9 +91,87 @@ func (m *MyFileResponse) GetName() string {
 	return ""
 }
 
+type DownloadRequestType struct {
+	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DownloadRequestType) Reset()         { *m = DownloadRequestType{} }
+func (m *DownloadRequestType) String() string { return proto.CompactTextString(m) }
+func (*DownloadRequestType) ProtoMessage()    {}
+func (*DownloadRequestType) Descriptor() ([]byte, []int) {
+	return fileDescriptor_grpc_sample_69eb31947fd22553, []int{2}
+}
+func (m *DownloadRequestType) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DownloadRequestType.Unmarshal(m, b)
+}
+func (m *DownloadRequestType) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DownloadRequestType.Marshal(b, m, deterministic)
+}
+func (dst *DownloadRequestType) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DownloadRequestType.Merge(dst, src)
+}
+func (m *DownloadRequestType) XXX_Size() int {
+	return xxx_messageInfo_DownloadRequestType.Size(m)
+}
+func (m *DownloadRequestType) XXX_DiscardUnknown() {
+	xxx_messageInfo_DownloadRequestType.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DownloadRequestType proto.InternalMessageInfo
+
+func (m *DownloadRequestType) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+type DownloadFileResponse struct {
+	Data                 []byte   `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DownloadFileResponse) Reset()         { *m = DownloadFileResponse{} }
+func (m *DownloadFileResponse) String() string { return proto.CompactTextString(m) }
+func (*DownloadFileResponse) ProtoMessage()    {}
+func (*DownloadFileResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_grpc_sample_69eb31947fd22553, []int{3}
+}
+func (m *DownloadFileResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DownloadFileResponse.Unmarshal(m, b)
+}
+func (m *DownloadFileResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DownloadFileResponse.Marshal(b, m, deterministic)
+}
+func (dst *DownloadFileResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DownloadFileResponse.Merge(dst, src)
+}
+func (m *DownloadFileResponse) XXX_Size() int {
+	return xxx_messageInfo_DownloadFileResponse.Size(m)
+}
+func (m *DownloadFileResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DownloadFileResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DownloadFileResponse proto.InternalMessageInfo
+
+func (m *DownloadFileResponse) GetData() []byte {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*RequestType)(nil), "RequestType")
 	proto.RegisterType((*MyFileResponse)(nil), "MyFileResponse")
+	proto.RegisterType((*DownloadRequestType)(nil), "DownloadRequestType")
+	proto.RegisterType((*DownloadFileResponse)(nil), "DownloadFileResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -109,6 +187,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type FileClient interface {
 	GetMyFile(ctx context.Context, in *RequestType, opts ...grpc.CallOption) (File_GetMyFileClient, error)
+	Download(ctx context.Context, in *DownloadRequestType, opts ...grpc.CallOption) (File_DownloadClient, error)
 }
 
 type fileClient struct {
@@ -151,9 +230,42 @@ func (x *fileGetMyFileClient) Recv() (*MyFileResponse, error) {
 	return m, nil
 }
 
+func (c *fileClient) Download(ctx context.Context, in *DownloadRequestType, opts ...grpc.CallOption) (File_DownloadClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_File_serviceDesc.Streams[1], "/File/Download", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &fileDownloadClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type File_DownloadClient interface {
+	Recv() (*DownloadFileResponse, error)
+	grpc.ClientStream
+}
+
+type fileDownloadClient struct {
+	grpc.ClientStream
+}
+
+func (x *fileDownloadClient) Recv() (*DownloadFileResponse, error) {
+	m := new(DownloadFileResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // FileServer is the server API for File service.
 type FileServer interface {
 	GetMyFile(*RequestType, File_GetMyFileServer) error
+	Download(*DownloadRequestType, File_DownloadServer) error
 }
 
 func RegisterFileServer(s *grpc.Server, srv FileServer) {
@@ -181,6 +293,27 @@ func (x *fileGetMyFileServer) Send(m *MyFileResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _File_Download_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(DownloadRequestType)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(FileServer).Download(m, &fileDownloadServer{stream})
+}
+
+type File_DownloadServer interface {
+	Send(*DownloadFileResponse) error
+	grpc.ServerStream
+}
+
+type fileDownloadServer struct {
+	grpc.ServerStream
+}
+
+func (x *fileDownloadServer) Send(m *DownloadFileResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 var _File_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "File",
 	HandlerType: (*FileServer)(nil),
@@ -191,23 +324,31 @@ var _File_serviceDesc = grpc.ServiceDesc{
 			Handler:       _File_GetMyFile_Handler,
 			ServerStreams: true,
 		},
+		{
+			StreamName:    "Download",
+			Handler:       _File_Download_Handler,
+			ServerStreams: true,
+		},
 	},
 	Metadata: "grpcsample/grpc-sample.proto",
 }
 
 func init() {
-	proto.RegisterFile("grpcsample/grpc-sample.proto", fileDescriptor_grpc_sample_8ee11f9f828ceb3f)
+	proto.RegisterFile("grpcsample/grpc-sample.proto", fileDescriptor_grpc_sample_69eb31947fd22553)
 }
 
-var fileDescriptor_grpc_sample_8ee11f9f828ceb3f = []byte{
-	// 132 bytes of a gzipped FileDescriptorProto
+var fileDescriptor_grpc_sample_69eb31947fd22553 = []byte{
+	// 185 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x49, 0x2f, 0x2a, 0x48,
 	0x2e, 0x4e, 0xcc, 0x2d, 0xc8, 0x49, 0xd5, 0x07, 0x31, 0x75, 0x21, 0x6c, 0xbd, 0x82, 0xa2, 0xfc,
 	0x92, 0x7c, 0x25, 0x5e, 0x2e, 0xee, 0xa0, 0xd4, 0xc2, 0xd2, 0xd4, 0xe2, 0x92, 0x90, 0xca, 0x82,
 	0x54, 0x25, 0x15, 0x2e, 0x3e, 0xdf, 0x4a, 0xb7, 0xcc, 0x9c, 0xd4, 0xa0, 0xd4, 0xe2, 0x82, 0xfc,
 	0xbc, 0xe2, 0x54, 0x21, 0x21, 0x2e, 0x96, 0xbc, 0xc4, 0xdc, 0x54, 0x09, 0x46, 0x05, 0x46, 0x0d,
-	0xce, 0x20, 0x30, 0xdb, 0xc8, 0x8c, 0x8b, 0x05, 0xa4, 0x46, 0x48, 0x8f, 0x8b, 0xd3, 0x3d, 0xb5,
-	0x04, 0xa2, 0x41, 0x88, 0x47, 0x0f, 0xc9, 0x20, 0x29, 0x7e, 0x3d, 0x54, 0x73, 0x94, 0x18, 0x0c,
-	0x18, 0x93, 0xd8, 0xc0, 0x76, 0x1a, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0xe3, 0x77, 0x8d, 0x43,
-	0x93, 0x00, 0x00, 0x00,
+	0xce, 0x20, 0x30, 0x5b, 0x49, 0x93, 0x4b, 0xd8, 0x25, 0xbf, 0x3c, 0x2f, 0x27, 0x3f, 0x31, 0x05,
+	0x49, 0x33, 0x56, 0xa5, 0x5a, 0x5c, 0x22, 0x30, 0xa5, 0xe8, 0xc6, 0xa6, 0x24, 0x96, 0x24, 0x82,
+	0xd5, 0xf2, 0x04, 0x81, 0xd9, 0x46, 0xc5, 0x5c, 0x2c, 0x20, 0x35, 0x42, 0x7a, 0x5c, 0x9c, 0xee,
+	0xa9, 0x25, 0x10, 0x77, 0x08, 0xf1, 0xe8, 0x21, 0x59, 0x21, 0xc5, 0xaf, 0x87, 0xea, 0x3c, 0x25,
+	0x06, 0x03, 0x46, 0x21, 0x6b, 0x2e, 0x0e, 0x98, 0x1d, 0x42, 0x22, 0x7a, 0x58, 0x5c, 0x26, 0x25,
+	0xaa, 0x87, 0xcd, 0x11, 0x20, 0xcd, 0x49, 0x6c, 0xe0, 0x70, 0x30, 0x06, 0x04, 0x00, 0x00, 0xff,
+	0xff, 0x2d, 0xc5, 0x21, 0xb9, 0x27, 0x01, 0x00, 0x00,
 }

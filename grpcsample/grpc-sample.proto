@@ -2,6 +2,7 @@ syntax = "proto3";
 
 service File {
   rpc GetMyFile (RequestType) returns (stream MyFileResponse) {};
+  rpc Download (DownloadRequestType) returns (stream DownloadFileResponse) {};
 }
 
 message RequestType {
@@ -9,4 +10,11 @@ message RequestType {
 
 message MyFileResponse {
   string name = 1;
+}
+
+message DownloadRequestType {
+  string name = 1;
+}
+message DownloadFileResponse {
+  bytes data = 1;
 }
