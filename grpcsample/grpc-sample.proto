@@ -10,10 +10,14 @@ message RequestType {
 
 message MyFileResponse {
   string name = 1;
+  int64 size = 2;
+  uint32 mode = 3;
+
 }
 
 message DownloadRequestType {
   string name = 1;
+
 }
 message DownloadFileResponse {
   bytes data = 1;

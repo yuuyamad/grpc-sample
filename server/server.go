@@ -9,7 +9,7 @@ import (
 )
 
 func main(){
-	port := ":9001"
+	port := ":8080"
 	lintenPort, err := net.Listen("tcp", port)
 	if err != nil{
 		log.Fatal(err)
@@ -18,10 +18,9 @@ func main(){
 	server := grpc.NewServer()
 	pb.RegisterFileServer(server, &service.MyFileService{})
 
-	go func() {
+
 		log.Printf("start grpc server port: %s",port)
 		server.Serve(lintenPort)
-	}()
 
 	server.Serve(lintenPort)
 }

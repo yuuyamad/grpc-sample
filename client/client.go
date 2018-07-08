@@ -8,18 +8,28 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"flag"
 )
 
 func main(){
-	conn, err := grpc.Dial("127.0.0.1:9001", grpc.WithInsecure())
+
+	var (
+
+		host = flag.String("h", "127.0.0.1", "hostname")
+	)
+
+	conn, err := grpc.Dial(*host + ":8080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("client connection error:", err)
 	}
 	defer conn.Close()
 	client := pb.NewFileClient(conn)
-
 	ctx := context.Background()
+
 	res, err := client.GetMyFile(ctx, &pb.RequestType{})
+	if err != nil {
+		panic(err)
+	}
 
 	for {
 		feature, err := res.Recv()
@@ -31,10 +41,24 @@ func main(){
 		}
 		log.Println(feature)
 
-		name := filepath.Join("/Users/yamadayuuta/dev/src/github.com/yuuyamad/grpc-sample", filepath.FromSlash(feature.Name))
+		if feature.Name == "."{
+			continue
+		}
+		name := filepath.Join("./", filepath.FromSlash(feature.Name))
+
+		if os.FileMode(feature.Mode).IsDir() {
+			err := os.MkdirAll(name, os.FileMode(feature.Mode))
+
+			if err != nil {
+				log.Printf("%s: %v", feature.Name, err)
+			}
+			continue
+		}
 		sdown, err := client.Download(ctx, &pb.DownloadRequestType{Name: feature.Name})
 
+		log.Println(name)
 		f, err := os.Create(name)
+
 		if err != nil {
 			log.Printf("%s: %v", feature.Name, err)
 			sdown.CloseSend()
